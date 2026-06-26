@@ -6,6 +6,10 @@ from dotenv import load_dotenv
 load_dotenv()
 os.environ["HF_HUB_ENABLE_HF_TRANSFER"] = os.getenv("HF_HUB_ENABLE_HF_TRANSFER", "1")
 os.environ["NO_ALBUMENTATIONS_UPDATE"] = "1"
+os.environ["PYTORCH_CUDA_ALLOC_CONF"] = os.getenv(
+    "PYTORCH_CUDA_ALLOC_CONF",
+    "expandable_segments:True",
+)
 seed = None
 if "SEED" in os.environ:
     try:

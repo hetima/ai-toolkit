@@ -70,6 +70,7 @@ const startAndWatchJob = (job: Job) => {
         CUDA_DEVICE_ORDER: 'PCI_BUS_ID',
         CUDA_VISIBLE_DEVICES: `${job.gpu_ids}`,
         IS_AI_TOOLKIT_UI: '1',
+        PYTORCH_CUDA_ALLOC_CONF: process.env.PYTORCH_CUDA_ALLOC_CONF || 'expandable_segments:True',
       };
 
       // HF_TOKEN
@@ -84,6 +85,7 @@ const startAndWatchJob = (job: Job) => {
         `[WORKER] Launch environment: AITK_JOB_ID=${additionalEnv.AITK_JOB_ID} ` +
           `IS_AI_TOOLKIT_UI=${additionalEnv.IS_AI_TOOLKIT_UI} ` +
           `CUDA_VISIBLE_DEVICES=${additionalEnv.CUDA_VISIBLE_DEVICES} ` +
+          `PYTORCH_CUDA_ALLOC_CONF=${additionalEnv.PYTORCH_CUDA_ALLOC_CONF} ` +
           `HF_TOKEN=${additionalEnv.HF_TOKEN ? '[set]' : '[unset]'}`,
       );
       console.log(`[WORKER] Launch config: ${configPath}`);
