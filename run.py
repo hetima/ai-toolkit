@@ -1,5 +1,6 @@
 import os
 import sys
+import traceback
 from dotenv import load_dotenv
 # Load the .env file if it exists
 load_dotenv()
@@ -113,6 +114,8 @@ def main():
             jobs_completed += 1
         except Exception as e:
             print_acc(f"Error running job: {e}")
+            if accelerator.is_main_process:
+                traceback.print_exc()
             jobs_failed += 1
             try:
                 job.process[0].on_error(e)
@@ -122,6 +125,8 @@ def main():
                 print_end_message(jobs_completed, jobs_failed)
                 raise e
         except KeyboardInterrupt as e:
+            if accelerator.is_main_process:
+                traceback.print_exc()
             try:
                 job.process[0].on_error(e)
             except Exception as e2:

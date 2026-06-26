@@ -464,6 +464,10 @@ class Krea2Model(BaseModel):
         if isinstance(prompt, str):
             prompt = [prompt]
 
+        if self.model_config.low_vram and self.model.device != torch.device("cpu"):
+            self.model.to("cpu")
+            flush()
+
         if self.text_encoder.device == torch.device("cpu"):
             self.text_encoder.to(self.device_torch)
 
@@ -486,6 +490,10 @@ class Krea2Model(BaseModel):
             # (L, n, d) -> (L, n*d)
             features = features.reshape(features.shape[0], -1)
             features_list.append(features.to(self.torch_dtype))
+
+        if self.model_config.low_vram:
+            self.text_encoder.to("cpu")
+            flush()
 
         return AdvancedPromptEmbeds(text_embeds=features_list)
 
