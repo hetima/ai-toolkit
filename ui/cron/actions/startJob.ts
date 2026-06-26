@@ -80,6 +80,14 @@ const startAndWatchJob = (job: Job) => {
 
       // Add the --log argument to the command
       const args = [runFilePath, configPath, '--log', logPath];
+      console.log(
+        `[WORKER] Launch environment: AITK_JOB_ID=${additionalEnv.AITK_JOB_ID} ` +
+          `IS_AI_TOOLKIT_UI=${additionalEnv.IS_AI_TOOLKIT_UI} ` +
+          `CUDA_VISIBLE_DEVICES=${additionalEnv.CUDA_VISIBLE_DEVICES} ` +
+          `HF_TOKEN=${additionalEnv.HF_TOKEN ? '[set]' : '[unset]'}`,
+      );
+      console.log(`[WORKER] Launch config: ${configPath}`);
+      console.log(`[WORKER] Launch log file: ${logPath}`);
       console.log(`[WORKER] Launching python command: ${[pythonPath, ...args].map(quoteArg).join(' ')}`);
 
       let subprocess;
