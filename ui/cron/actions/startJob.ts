@@ -6,6 +6,7 @@ import fs from 'fs';
 import { TOOLKIT_ROOT, getTrainingFolder, getHFToken } from '../paths';
 import { resolvePythonPath } from '../pythonPath';
 const isWindows = process.platform === 'win32';
+const quoteArg = (value: string) => (/\s/.test(value) ? `"${value.replace(/"/g, '\\"')}"` : value);
 
 const startAndWatchJob = (job: Job) => {
   // starts and watches the job asynchronously
@@ -79,6 +80,7 @@ const startAndWatchJob = (job: Job) => {
 
       // Add the --log argument to the command
       const args = [runFilePath, configPath, '--log', logPath];
+      console.log(`[WORKER] Launching python command: ${[pythonPath, ...args].map(quoteArg).join(' ')}`);
 
       let subprocess;
 
