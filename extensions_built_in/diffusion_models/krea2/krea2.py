@@ -329,6 +329,7 @@ class Krea2Model(BaseModel):
                 self.model_config.qtype = "float8"
 
         if self.model_config.quantize:
+            self.print_and_status_update("Keeping transformer on CPU for quantization")
             self.print_and_status_update("Quantizing transformer")
             quantize_model(self, transformer)
             flush()
@@ -351,6 +352,8 @@ class Krea2Model(BaseModel):
         if self.model_config.low_vram:
             self.print_and_status_update("Moving transformer to CPU")
             transformer.to("cpu")
+        elif self.model_config.quantize:
+            transformer.to(self.device_torch)
         else:
             transformer.to(self.device_torch, dtype=dtype)
         flush()
