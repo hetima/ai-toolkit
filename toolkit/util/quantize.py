@@ -130,6 +130,23 @@ def quantize(
         include = [include] if isinstance(include, str) else include
     if exclude is not None:
         exclude = [exclude] if isinstance(exclude, str) else exclude
+    if isinstance(weights, aotype):
+        def filter_fn(module: torch.nn.Module, name: str) -> bool:
+            if not isinstance(module, torch.nn.Linear):
+                return False
+            if isinstance(module, torch.nn.modules.linear.NonDynamicallyQuantizableLinear):
+                return False
+            if is_quantized_tensor(getattr(module, "weight", None)):
+                return False
+            if include is not None and not any(fnmatch(name, pattern) for pattern in include):
+                return False
+            if exclude is not None and any(fnmatch(name, pattern) for pattern in exclude):
+                return False
+            return True
+
+        torchao_quantize_(model, weights.config, filter_fn=filter_fn)
+        return
+
     for name, m in model.named_modules():
         if include is not None and not any(
             fnmatch(name, pattern) for pattern in include
@@ -142,17 +159,14 @@ def quantize(
             if m.__class__.__name__ in Q_MODULES:
                 continue
             else:
-                if isinstance(weights, aotype):
-                    torchao_quantize_(m, weights.config)
-                else:
-                    _quantize_submodule(
-                        model,
-                        name,
-                        m,
-                        weights=weights,
-                        activations=activations,
-                        optimizer=optimizer,
-                    )
+                _quantize_submodule(
+                    model,
+                    name,
+                    m,
+                    weights=weights,
+                    activations=activations,
+                    optimizer=optimizer,
+                )
         except Exception as e:
             print(f"Failed to quantize {name}: {e}")
             # raise e
